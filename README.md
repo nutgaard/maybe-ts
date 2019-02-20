@@ -19,7 +19,7 @@ The library exports two different ways of using the `Maybe`-monad, functional an
 
 Function:
 ```
-import Maybe, { pipe } from 'maybe-ts';
+import Maybe from 'maybe-ts';
 
 Maybe.map((value) => value.toUpperCase(), Maybe.just('Hello, World'));
 
