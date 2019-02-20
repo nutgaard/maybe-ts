@@ -1,3 +1,5 @@
+const curry = require('lodash.curry');
+
 export enum MaybeType {
   JUST = 'JUST',
   NOTHING = 'NOTHING'
@@ -70,7 +72,7 @@ export class MaybeCls<TYPE> {
   }
 
   public or(other: MaybeCls<TYPE>): MaybeCls<TYPE> {
-    return new MaybeCls(or(this.maybe, other.maybe));
+    return new MaybeCls(or(other.maybe, this.maybe));
   }
 
   public toArray(): Array<TYPE> {
@@ -146,7 +148,7 @@ function isJust(maybe: Maybe<any>): boolean {
   return maybe.type === MaybeType.JUST;
 }
 
-function or<TYPE>(maybe: Maybe<TYPE>, other: Maybe<TYPE>): Maybe<TYPE> {
+function or<TYPE>(other: Maybe<TYPE>, maybe: Maybe<TYPE>): Maybe<TYPE> {
   return typeMatching(() => other, () => maybe, maybe);
 }
 
@@ -161,17 +163,17 @@ function nothing() {
 export default {
   just,
   of: just,
-  withDefault,
-  map,
-  map2,
-  filter,
+  withDefault: curry(withDefault),
+  map: curry(map),
+  map2: curry(map2),
+  filter: curry(filter),
   join,
   flat: join,
-  andThen,
-  flatMap: andThen,
+  andThen: curry(andThen),
+  flatMap: curry(andThen),
   isNothing,
   isJust,
-  or,
+  or: curry(or),
   toArray,
   nothing
 };

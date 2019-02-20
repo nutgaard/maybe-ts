@@ -1,4 +1,5 @@
 import Maybe, { MaybeType } from '../src/maybe-ts';
+import { pipe } from './pipe';
 
 describe('Maybe', () => {
   describe('functional', () => {
@@ -109,7 +110,7 @@ describe('Maybe', () => {
 
     describe('or', () => {
       it('should keep first if Just', () => {
-        expect(Maybe.or(Maybe.just(3), Maybe.just(4))).toEqual(Maybe.just(3));
+        expect(Maybe.or(Maybe.just(3), Maybe.just(4))).toEqual(Maybe.just(4));
         expect(Maybe.or(Maybe.just(3), Maybe.nothing())).toEqual(Maybe.just(3));
       });
       it('should keep second if Just', () => {
@@ -143,6 +144,20 @@ describe('Maybe', () => {
 
     it('nothing', () => {
       expect(Maybe.nothing().type).toBe(MaybeType.NOTHING);
+    });
+
+    it('should support currying', () => {
+      const result = pipe(
+        Maybe.just(3),
+        Maybe.map((value: number) => 2 * value),
+        Maybe.map2((value: number, other: number) => value + other, Maybe.just(10)),
+        Maybe.filter((value: number) => value < 100),
+        Maybe.andThen((value: number) => Maybe.nothing()),
+        Maybe.or(Maybe.just(1337)),
+        Maybe.withDefault(1337)
+      );
+
+      expect(result).toEqual(1337);
     });
   });
 });

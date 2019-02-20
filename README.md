@@ -19,9 +19,15 @@ The library exports two different ways of using the `Maybe`-monad, functional an
 
 Function:
 ```
-import Maybe from 'maybe-ts';
+import Maybe, { pipe } from 'maybe-ts';
 
 Maybe.map((value) => value.toUpperCase(), Maybe.just('Hello, World'));
+
+// If you use a library for `compose`/`flow`/`pipe` or similar concepts. (See ./test/pipe.ts example)
+pipe(
+  Maybe.just('Hello, World'),
+  Maybe.map((value: string) => value.toUpperCase())
+);
 
 // Or, with the use of the pipe-operator
 Maybe.just('Hello, World')
