@@ -1,5 +1,5 @@
 {
-  "name": "maybe-ts",
+  "name": "@nutgaard/maybe-ts",
   "version": "0.0.0-development",
   "description": "",
   "keywords": [],
@@ -13,6 +13,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/nutgaard/maybe-ts"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "license": "MIT",
   "engines": {
