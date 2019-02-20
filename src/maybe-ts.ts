@@ -15,12 +15,12 @@ export class MaybeCls<TYPE> {
     this.maybe = maybe;
   }
 
-  public static of<TYPE>(value: TYPE): MaybeCls<TYPE> {
-    return new MaybeCls(of(value));
+  public static just<TYPE>(value: TYPE): MaybeCls<TYPE> {
+    return new MaybeCls(just(value));
   }
 
-  public static just<TYPE>(value: TYPE): MaybeCls<TYPE> {
-    return new MaybeCls(of(value));
+  public static of<TYPE>(value: TYPE): MaybeCls<TYPE> {
+    return new MaybeCls(just(value));
   }
 
   public static nothing<TYPE>(): MaybeCls<TYPE> {
@@ -91,7 +91,7 @@ function typeMatching<TYPE, RETURN>(
   }
 }
 
-function of<TYPE>(value: TYPE | null | undefined): Maybe<TYPE> {
+function just<TYPE>(value: TYPE | null | undefined): Maybe<TYPE> {
   if (value === null || value === undefined) {
     return NothingValue;
   }
@@ -103,7 +103,7 @@ function withDefault<TYPE>(defaultValue: TYPE, maybe: Maybe<TYPE>): TYPE {
 }
 
 function map<TYPE, NEWTYPE>(fn: (value: TYPE) => NEWTYPE, maybe: Maybe<TYPE>): Maybe<NEWTYPE> {
-  return typeMatching(() => NothingValue, value => of(fn(value)), maybe);
+  return typeMatching(() => NothingValue, value => just(fn(value)), maybe);
 }
 
 function map2<TYPE, OTHER, NEWTYPE>(
@@ -114,7 +114,7 @@ function map2<TYPE, OTHER, NEWTYPE>(
   return typeMatching(
     () => NothingValue,
     (value: TYPE) =>
-      typeMatching(() => NothingValue, (other: OTHER) => of(fn(value, other)), other),
+      typeMatching(() => NothingValue, (other: OTHER) => just(fn(value, other)), other),
     maybe
   );
 }
@@ -135,7 +135,7 @@ function andThen<TYPE, NEWTYPE>(
   fn: (value: TYPE) => Maybe<NEWTYPE>,
   maybe: Maybe<TYPE>
 ): Maybe<NEWTYPE> {
-  return typeMatching(() => NothingValue, value => join(of(fn(value))), maybe);
+  return typeMatching(() => NothingValue, value => join(just(fn(value))), maybe);
 }
 
 function isNothing(maybe: Maybe<any>): boolean {
@@ -159,8 +159,8 @@ function nothing() {
 }
 
 export default {
-  of,
-  just: of,
+  just,
+  of: just,
   withDefault,
   map,
   map2,
