@@ -37,6 +37,11 @@ describe('Maybe', () => {
 
         expect(Maybe.withDefault(3, nothing)).toBe(3);
       });
+      it('should return defaultValue even if null', () => {
+        const nothing = Maybe.nothing();
+
+        expect(Maybe.withDefault(null, nothing)).toBe(null);
+      });
     });
 
     describe('map', () => {

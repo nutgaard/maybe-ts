@@ -33,8 +33,11 @@ export class MaybeCls<TYPE> {
     return maybe.withDefault(MaybeCls.nothing());
   }
 
-  public withDefault(defaultValue: TYPE): TYPE {
+  public withDefault<OTHER>(defaultValue: OTHER): TYPE | OTHER {
     return withDefault(defaultValue, this.maybe);
+  }
+  public getOrElse<OTHER>(defaultValue: OTHER): TYPE | OTHER {
+    return this.withDefault(defaultValue);
   }
 
   public map<NEWTYPE>(fn: (value: TYPE) => NEWTYPE): MaybeCls<NEWTYPE> {
@@ -61,6 +64,10 @@ export class MaybeCls<TYPE> {
       return NothingValue;
     };
     return new MaybeCls(andThen(fn2, this.maybe));
+  }
+
+  public flatMap<NEWTYPE>(fn: (value: TYPE) => MaybeCls<NEWTYPE>): MaybeCls<NEWTYPE> {
+    return this.andThen(fn);
   }
 
   public isNothing(): boolean {
@@ -100,8 +107,8 @@ function just<TYPE>(value: TYPE | null | undefined): Maybe<TYPE> {
   return { type: MaybeType.JUST, value: value };
 }
 
-function withDefault<TYPE>(defaultValue: TYPE, maybe: Maybe<TYPE>): TYPE {
-  return typeMatching(() => defaultValue, value => value, maybe);
+function withDefault<TYPE, OTHER>(defaultValue: OTHER, maybe: Maybe<TYPE>): TYPE | OTHER {
+  return typeMatching<TYPE, TYPE | OTHER>(() => defaultValue, value => value, maybe);
 }
 
 function map<TYPE, NEWTYPE>(fn: (value: TYPE) => NEWTYPE, maybe: Maybe<TYPE>): Maybe<NEWTYPE> {
@@ -164,6 +171,7 @@ export default {
   just,
   of: just,
   withDefault: curry(withDefault),
+  getOrElse: curry(withDefault),
   map: curry(map),
   map2: curry(map2),
   filter: curry(filter),

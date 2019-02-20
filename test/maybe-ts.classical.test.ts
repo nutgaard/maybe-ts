@@ -24,11 +24,19 @@ describe('Maybe', () => {
         const maybeNumber = Maybe.just(3);
 
         expect(maybeNumber.withDefault(0)).toBe(3);
+        expect(maybeNumber.getOrElse(0)).toBe(3);
       });
       it('should return defaultValue', () => {
         const nothing = Maybe.nothing();
 
         expect(nothing.withDefault(3)).toBe(3);
+        expect(nothing.getOrElse(3)).toBe(3);
+      });
+      it('should return defaultValue even if null', () => {
+        const nothing = Maybe.nothing();
+
+        expect(nothing.withDefault(null)).toBe(null);
+        expect(nothing.getOrElse(null)).toBe(null);
       });
     });
 
@@ -94,12 +102,15 @@ describe('Maybe', () => {
       it('should propagate Nothing', () => {
         const nullNumber = Maybe.just((null as unknown) as number);
         expect(nullNumber.andThen(() => Maybe.just(3))).toEqual(Maybe.nothing());
+        expect(nullNumber.flatMap(() => Maybe.just(3))).toEqual(Maybe.nothing());
       });
       it('should flatten nested Maybe', () => {
         expect(Maybe.just(0).andThen(() => Maybe.just(3))).toEqual(Maybe.just(3));
+        expect(Maybe.just(0).flatMap(() => Maybe.just(3))).toEqual(Maybe.just(3));
       });
       it('should convert to Nothing if null is returned', () => {
         expect(Maybe.just(0).andThen(() => null as any)).toEqual(Maybe.nothing());
+        expect(Maybe.just(0).flatMap(() => null as any)).toEqual(Maybe.nothing());
       });
     });
 
