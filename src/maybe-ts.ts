@@ -17,11 +17,11 @@ export class MaybeCls<TYPE> {
     this.maybe = maybe;
   }
 
-  public static just<TYPE>(value: TYPE): MaybeCls<TYPE> {
+  public static just<TYPE>(value: TYPE | null | undefined): MaybeCls<TYPE> {
     return new MaybeCls(just(value));
   }
 
-  public static of<TYPE>(value: TYPE): MaybeCls<TYPE> {
+  public static of<TYPE>(value: TYPE | null | undefined): MaybeCls<TYPE> {
     return new MaybeCls(just(value));
   }
 
@@ -36,8 +36,17 @@ export class MaybeCls<TYPE> {
   public withDefault<OTHER>(defaultValue: OTHER): TYPE | OTHER {
     return withDefault(defaultValue, this.maybe);
   }
+
+  public withDefaultLazy<OTHER>(defaultValue: () => OTHER): TYPE | OTHER {
+    return withDefaultLazy(defaultValue, this.maybe);
+  }
+
   public getOrElse<OTHER>(defaultValue: OTHER): TYPE | OTHER {
     return this.withDefault(defaultValue);
+  }
+
+  public getOrElseGet<OTHER>(defaultValue: () => OTHER): TYPE | OTHER {
+    return this.withDefaultLazy(defaultValue);
   }
 
   public map<NEWTYPE>(fn: (value: TYPE) => NEWTYPE): MaybeCls<NEWTYPE> {
@@ -111,6 +120,10 @@ function withDefault<TYPE, OTHER>(defaultValue: OTHER, maybe: Maybe<TYPE>): TYPE
   return typeMatching<TYPE, TYPE | OTHER>(() => defaultValue, value => value, maybe);
 }
 
+function withDefaultLazy<TYPE, OTHER>(defaultValue: () => OTHER, maybe: Maybe<TYPE>): TYPE | OTHER {
+  return typeMatching<TYPE, TYPE | OTHER>(() => defaultValue(), value => value, maybe);
+}
+
 function map<TYPE, NEWTYPE>(fn: (value: TYPE) => NEWTYPE, maybe: Maybe<TYPE>): Maybe<NEWTYPE> {
   return typeMatching(() => NothingValue, value => just(fn(value)), maybe);
 }
@@ -171,7 +184,9 @@ export default {
   just,
   of: just,
   withDefault: curry(withDefault),
+  withDefaultLazy: curry(withDefaultLazy),
   getOrElse: curry(withDefault),
+  getOrElseGet: curry(withDefaultLazy),
   map: curry(map),
   map2: curry(map2),
   filter: curry(filter),

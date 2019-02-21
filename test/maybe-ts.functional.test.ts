@@ -44,6 +44,30 @@ describe('Maybe', () => {
       });
     });
 
+    describe('withDefaultLazy', () => {
+      it('should return value', () => {
+        const defaultValue = jest.fn().mockReturnValue(0);
+        const maybeNumber = Maybe.just(3);
+
+        expect(Maybe.withDefaultLazy(defaultValue, maybeNumber)).toBe(3);
+        expect(defaultValue).toHaveBeenCalledTimes(0);
+      });
+      it('should return defaultValue', () => {
+        const defaultValue = jest.fn().mockReturnValue(3);
+        const nothing = Maybe.nothing();
+
+        expect(Maybe.withDefaultLazy(defaultValue, nothing)).toBe(3);
+        expect(defaultValue).toHaveBeenCalledTimes(1);
+      });
+      it('should return defaultValue even if null', () => {
+        const defaultValue = jest.fn().mockReturnValue(null);
+        const nothing = Maybe.nothing();
+
+        expect(Maybe.withDefaultLazy(defaultValue, nothing)).toBe(null);
+        expect(defaultValue).toHaveBeenCalledTimes(1);
+      });
+    });
+
     describe('map', () => {
       it('should ignore Nothing value', () => {
         expect(Maybe.map(() => 3, Maybe.nothing())).toBe(Maybe.nothing());

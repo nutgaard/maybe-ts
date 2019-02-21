@@ -9,13 +9,13 @@ describe('Maybe', () => {
       });
 
       it('should create Nothing from null', () => {
-        expect(Maybe.just((null as unknown) as number).withDefault(0)).toBe(0);
-        expect(Maybe.of((null as unknown) as number).withDefault(0)).toBe(0);
+        expect(Maybe.just(null).withDefault(0)).toBe(0);
+        expect(Maybe.of(null).withDefault(0)).toBe(0);
       });
 
       it('should create Nothing from undefind', () => {
-        expect(Maybe.just((undefined as unknown) as number).withDefault(0)).toBe(0);
-        expect(Maybe.of((undefined as unknown) as number).withDefault(0)).toBe(0);
+        expect(Maybe.just(undefined).withDefault(0)).toBe(0);
+        expect(Maybe.of(undefined).withDefault(0)).toBe(0);
       });
     });
 
@@ -37,6 +37,33 @@ describe('Maybe', () => {
 
         expect(nothing.withDefault(null)).toBe(null);
         expect(nothing.getOrElse(null)).toBe(null);
+      });
+    });
+
+    describe('withDefaultLazy', () => {
+      it('should return value', () => {
+        const defaultValue = jest.fn().mockReturnValue(0);
+        const maybeNumber = Maybe.just(3);
+
+        expect(maybeNumber.withDefaultLazy(defaultValue)).toBe(3);
+        expect(maybeNumber.getOrElseGet(defaultValue)).toBe(3);
+        expect(defaultValue).toHaveBeenCalledTimes(0);
+      });
+      it('should return defaultValue', () => {
+        const defaultValue = jest.fn().mockReturnValue(3);
+        const nothing = Maybe.nothing();
+
+        expect(nothing.withDefaultLazy(defaultValue)).toBe(3);
+        expect(nothing.getOrElseGet(defaultValue)).toBe(3);
+        expect(defaultValue).toHaveBeenCalledTimes(2);
+      });
+      it('should return defaultValue even if null', () => {
+        const defaultValue = jest.fn().mockReturnValue(null);
+        const nothing = Maybe.nothing();
+
+        expect(nothing.withDefaultLazy(defaultValue)).toBe(null);
+        expect(nothing.getOrElseGet(defaultValue)).toBe(null);
+        expect(defaultValue).toHaveBeenCalledTimes(2);
       });
     });
 
@@ -100,9 +127,8 @@ describe('Maybe', () => {
 
     describe('andThen', () => {
       it('should propagate Nothing', () => {
-        const nullNumber = Maybe.just((null as unknown) as number);
-        expect(nullNumber.andThen(() => Maybe.just(3))).toEqual(Maybe.nothing());
-        expect(nullNumber.flatMap(() => Maybe.just(3))).toEqual(Maybe.nothing());
+        expect(Maybe.just(null).andThen(() => Maybe.just(3))).toEqual(Maybe.nothing());
+        expect(Maybe.just(null).flatMap(() => Maybe.just(3))).toEqual(Maybe.nothing());
       });
       it('should flatten nested Maybe', () => {
         expect(Maybe.just(0).andThen(() => Maybe.just(3))).toEqual(Maybe.just(3));
@@ -138,13 +164,13 @@ describe('Maybe', () => {
 
     describe('isJust', () => {
       expect(Maybe.just(3).isJust()).toBe(true);
-      expect(Maybe.just(null as any).isJust()).toBe(false);
+      expect(Maybe.just(null).isJust()).toBe(false);
       expect(Maybe.nothing().isJust()).toBe(false);
     });
 
     it('isNothing', () => {
       expect(Maybe.just(3).isNothing()).toBe(false);
-      expect(Maybe.just(null as any).isNothing()).toBe(true);
+      expect(Maybe.just(null).isNothing()).toBe(true);
       expect(Maybe.nothing().isNothing()).toBe(true);
     });
   });
