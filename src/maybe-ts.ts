@@ -60,6 +60,14 @@ export class MaybeCls<TYPE> {
     return new MaybeCls(map2(fn, other.maybe, this.maybe));
   }
 
+  public map3<OTHER1, OTHER2, NEWTYPE>(
+    fn: (value: TYPE, other1: OTHER1, other2: OTHER2) => NEWTYPE,
+    other1: MaybeCls<OTHER1>,
+    other2: MaybeCls<OTHER2>
+  ): MaybeCls<NEWTYPE> {
+    return new MaybeCls(map3(fn, other1.maybe, other2.maybe, this.maybe));
+  }
+
   public filter(predicate: (value: TYPE) => boolean): MaybeCls<TYPE> {
     return new MaybeCls(filter(predicate, this.maybe));
   }
@@ -141,6 +149,29 @@ function map2<TYPE, OTHER, NEWTYPE>(
   );
 }
 
+function map3<TYPE, OTHER1, OTHER2, NEWTYPE>(
+  fn: (value: TYPE, other1: OTHER1, other2: OTHER2) => NEWTYPE,
+  other1: Maybe<OTHER1>,
+  other2: Maybe<OTHER2>,
+  maybe: Maybe<TYPE>
+): Maybe<NEWTYPE> {
+  return typeMatching(
+    () => NothingValue,
+    (value: TYPE) =>
+      typeMatching(
+        () => NothingValue,
+        (other1: OTHER1) =>
+          typeMatching(
+            () => NothingValue,
+            (other2: OTHER2) => just(fn(value, other1, other2)),
+            other2
+          ),
+        other1
+      ),
+    maybe
+  );
+}
+
 function filter<TYPE>(predicate: (value: TYPE) => boolean, maybe: Maybe<TYPE>): Maybe<TYPE> {
   return typeMatching(
     () => NothingValue,
@@ -189,6 +220,7 @@ export default {
   getOrElseGet: curry(withDefaultLazy),
   map: curry(map),
   map2: curry(map2),
+  map3: curry(map3),
   filter: curry(filter),
   join,
   flat: join,

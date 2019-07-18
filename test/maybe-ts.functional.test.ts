@@ -100,6 +100,41 @@ describe('Maybe', () => {
       });
     });
 
+    describe('map3', () => {
+      const add = (a: number, b: number, c: number) => a + b + c;
+
+      it('should ignore if all value is Nothing', () => {
+        expect(Maybe.map3(add, Maybe.nothing(), Maybe.nothing(), Maybe.nothing())).toBe(
+          Maybe.nothing()
+        );
+      });
+      it('should ignore if first value is Nothing', () => {
+        expect(Maybe.map3(add, Maybe.nothing(), Maybe.just(4), Maybe.just(3))).toBe(
+          Maybe.nothing()
+        );
+      });
+      it('should ignore if second value is Nothing', () => {
+        expect(Maybe.map3(add, Maybe.just(3), Maybe.nothing(), Maybe.just(3))).toBe(
+          Maybe.nothing()
+        );
+      });
+      it('should ignore if third value is Nothing', () => {
+        expect(Maybe.map3(add, Maybe.just(3), Maybe.just(5), Maybe.nothing())).toBe(
+          Maybe.nothing()
+        );
+      });
+      it('should map user function if all are Just', () => {
+        expect(Maybe.map3(add, Maybe.just(3), Maybe.just(4), Maybe.just(5))).toEqual(
+          Maybe.just(12)
+        );
+      });
+      it('should convert to Nothing if function return null', () => {
+        expect(Maybe.map3(() => null, Maybe.just(3), Maybe.just(4), Maybe.just(5))).toBe(
+          Maybe.nothing()
+        );
+      });
+    });
+
     describe('filter', () => {
       it('should propagate Nothing', () => {
         expect(Maybe.filter(() => true, Maybe.nothing())).toBe(Maybe.nothing());
